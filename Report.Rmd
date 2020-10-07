@@ -1,0 +1,52 @@
+---
+title: "Project"
+author: "KIESGEN de RICHTER Stanislas – VAIO Luca"
+date: "10/2/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Discovering the dataset
+
+Our dataset is about Smoking, Alcohol and esophageal Cancer.
+The aim of the study is to confirm the correlation between cancers and age, as well as consummation of tobacco and consummation of alcohol. 
+
+Let's first explore the dataset. Here is the beginning, and its summary:
+
+```{r}
+head(esoph, 8)
+cat("Number of combinations: ", dim(esoph)[1], "\nNumber of persons checked: ",
+    sum(esoph $ncontrols))
+```
+The study takes into account the age group of each individual, along with their alcohol and tobacco consumption per day. The age groups start at 25 and are divided by ranges of 10 years, the alcohol by ranges of 40g/day and the tobacco by ranges of 10g/day.
+In the dataset, each combination of the three groups is presented with the corresponding number of controls and cases.
+
+```{r}
+summary(esoph)
+```
+
+In the summary, the first three columns only represent the number of lines of 'agegp', 'alcgp' and 'tobgp'. We cannot get any valuable information from this.
+The cases go from 0 to 17 by combination. The maximum seems to be quite far from the median, and even the third quartile which is 4, meaning that there is a peak in one of the combinations.
+As we see in the last column, the controls are not equally distributed: the controls vary from 1 to 60 depending on the group combination. This means that the combinations of the three groups (age, alc, tob) are not equally distributed.
+Therefore, we will have to compute correlation indexes between the different variables.
+
+## Controls
+
+As said before, one issue is that the controls are not equally distributed, the next bar plot allows to visualize it.
+
+```{r}
+cases = tapply(esoph $ncases, esoph $agegp, sum)
+controls = tapply(esoph $ncontrols, esoph $agegp, sum)
+
+non_cases = controls - cases
+percentages = cases / controls * 100
+
+ylim <- c(0, 1.1*max(controls))
+plot <- barplot(rbind(cases, non_cases), ylim=ylim, legend=c("Cases", "Non cases"),
+                col=c("#990000", "#CCFF99"))
+text(x=plot, y=controls, label=paste(round(percentages, 2), "%"), pos=3)
+```
+
