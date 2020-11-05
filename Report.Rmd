@@ -51,7 +51,7 @@ percentages = cases / controls * 100
 
 ylim <- c(0, 1.1*max(controls))
 plot <- barplot(rbind(cases, non_cases), ylim=ylim, legend=c("Cases", "Non cases"),
-                col=c("#990000", "#CCFF99"), xlab="Age", ylab="Frequency")
+                col=c("#990000", "#CCFF99"), xlab="Age group", ylab="Frequency")
 text(x=plot, y=controls, label=paste(round(percentages, 2), "%"), pos=3)
 ```
 ```{r}
@@ -63,7 +63,7 @@ percentages = cases / controls * 100
 
 ylim <- c(0, 1.1*max(controls))
 plot <- barplot(rbind(cases, non_cases), ylim=ylim, legend=c("Cases", "Non cases"),
-                col=c("#990000", "#CCFF99"), xlab="Alcohol consumption", ylab="Frequency")
+                col=c("#990000", "#CCFF99"), xlab="Alcohol group", ylab="Frequency")
 text(x=plot, y=controls, label=paste(round(percentages, 2), "%"), pos=3)
 ```
 ```{r}
@@ -75,7 +75,7 @@ percentages = cases / controls * 100
 
 ylim <- c(0, 1.1*max(controls))
 plot <- barplot(rbind(cases, non_cases), ylim=ylim, legend=c("Cases", "Non cases"),
-                col=c("#990000", "#CCFF99"), xlab="Tobacco consumption", ylab="Frequency")
+                col=c("#990000", "#CCFF99"), xlab="Tobacco group", ylab="Frequency")
 text(x=plot, y=controls, label=paste(round(percentages, 2), "%"), pos=3)
 ```
 
@@ -84,6 +84,19 @@ Total proportion of cases by age group. We clearly see that cases are more prese
 total_prop = tapply(esoph$ncases, esoph$agegp, sum) / tapply(esoph$ncontrols, esoph$agegp, sum) * 100
 
 plot(unique(esoph$agegp), total_prop, xlab="Age group", ylab="Proportion")
+```
+
+
+```{r}
+total_prop_alc = tapply(esoph$ncases, esoph$alcgp, sum) / tapply(esoph$ncontrols, esoph$alcgp, sum) * 100
+
+plot(unique(esoph$alcgp), total_prop_alc, xlab="Alcohol group", ylab="Proportion")
+```
+
+```{r}
+total_prop_tob = tapply(esoph$ncases, esoph$tobgp, sum) / tapply(esoph$ncontrols, esoph$tobgp, sum) * 100
+
+plot(unique(esoph$tobgp), total_prop_tob, xlab="Tobacco group", ylab="Proportion")
 ```
 
 
