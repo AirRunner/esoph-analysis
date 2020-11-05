@@ -127,13 +127,33 @@ summary(esoph_prop$prop_cases)
 ```
 We see that this is in fact a percentage, from 0% to 100%, with a mean of 34.68% positive cases.
 
+............. A commpleter..............
+
+
+
+
+
+### Tobacco impact on cancer depending on alchohol consumption 
+We want to know the impact of tobacco on cancer frequency depending on alcohol consumption 
+
 First, it can be seen here that alcohol consumption has less of an effect than tobacco on low-dose cancer cases. However, at higher doses, the effects of alcohol catch up with those of tobacco.
 With alcohol consumption above 80 g/day, tobacco consumption has almost no effect on cancer cases.
+
+For that we use two bar plots with the proportion of cases depending on alcohol and tobacco consumption
 ```{r}
 library(ggplot2)
 ggplot(esoph_prop, aes(alcohol, prop_cases, fill=tobacco)) + geom_bar(stat="identity", position="dodge")
 ```
-Let's try to build a model.
+```{r}
+library(ggplot2)
+ggplot(esoph_prop, aes(tobacco, prop_cases, fill=alcohol)) + geom_bar(stat="identity", position="dodge")
+```
+First, it can be seen here that alcohol consumption has less of an effect than tobacco on low-dose cancer cases. However, at higher doses, the effects of alcohol catch up with those of tobacco.
+With alcohol consumption above 80 g/day, tobacco consumption has almost no effect on cancer cases.
+
+From the two plots we can see that a high consumption of alcohol (above 80g/day) will lead in almost every cases to an esophageal cancer while tobacco has, it seems, a weaker impact on its own, going up to 60% when no alcohol is consumed. 
+
+So tobacco has no impact on esophageal cancer above 80g of alcohol consumed per day as the cancer most certainly exist already but still has an impact on its own or under 80g of alcohol per day. 
 
 
 # Building a model
