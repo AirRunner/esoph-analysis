@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Discovering the dataset
 
-Our dataset comes from a case-control study of œsophageal cancer conducted in Ile-et-Vilaine, France. The dataset is composed of three factors: age groups, alcohol consumption and tobacco consumption. The number of people controlled and proven cases of cancer are given for each group combination. The aim of the study is to confirm the correlation between cancers and age, as well as consumption of alcohol and of tobacco. 
+Our dataset comes from a case-control study of œsophageal cancer conducted in Ille-et-Vilaine, France. The dataset is composed of three factors: age groups, alcohol consumption and tobacco consumption. The number of people controlled and proven cases of cancer are given for each group combination. The aim of the study is to confirm the correlation between cancers and age, as well as consumption of alcohol and of tobacco. 
 
 To begin with, let's explore the esoph dataset. With R, we can display the first 8 lines, and its dimensions.
 
@@ -133,7 +133,7 @@ tob_plot <- ggplot(as.data.frame(tob_proportions), aes(x=c(0:3), y=tob_proportio
 ggarrange(age_plot, alc_plot, tob_plot)
 ```
 
-on the graphs, for instance, we clearly see that the proportion of positive cases is higher when the person is old. However, we see that the 75+ group doesn't have so much cases, which can maybe be explained by the fact that people with cancer die before.
+On the graphs, for instance, we clearly see that the proportion of positive cases is higher when the person is old. However, we see that the 75+ group doesn't have so much cases, which can maybe be explained by the fact that people with cancer die before.
 But more generally, a clear trend seems to be emerging for all three variables: cancer cases seem to increase with age or consumption. This would mean that the rate of positive cases would be correlated with the variables.
 
 At this stage, we can therefore state three hypotheses:
@@ -154,7 +154,8 @@ In order to answer these questions, we need to test the null hypotheses $H_0$. T
 First, let's explain briefly what a $\chi^2$ test is about.
 Let $o_{ij}$ is the frequency observed at line $i$ of `prop_cases` and at line $j$ of `age`, and $c_{ij}$ is the calculated frequency expected for the null hypothesis $H_0$ (i.e. if the variables are independent).
 The null hypothesis must be rejected if the p-value, i.e. the probability of finding the expected value, determined by the following $\chi^2$ test, is lower than the significance level $\alpha$, generally $0.05$.
-$\chi^2$ test: $\chi^2 = \sum_{i,j}\frac{\left(o_{ij} - c_{ij}\right)^2}{c_{ij}}$
+
+$\chi^2 = \sum_{i,j}\frac{\left(o_{ij} - c_{ij}\right)^2}{c_{ij}}$
 
 For a $\chi^2$ test to be accurate, the given values should not be too small, otherwise R will warn it. A solution for that could be bootstrapping, i.e. simulating a certain number of samples according to the original dataset, in order to further enhance the accuracy of the test. This method is directly integrated in the $\chi^2$ test function of R, with attribute `simulate.p.value`.
 In our case, we will use the `xtabs` function in order to build a contingency table with frequencies of data we are interested in.
@@ -297,7 +298,7 @@ ggplot(esoph_prop, aes(x=y_tob, y=X)) + geom_point() + geom_smooth(method="lm") 
   labs(x="Tobacco Groups", y="Proportion of cancers (%)") + theme_bw()
 ```
 
-In the end, as shown above, we see that tobacco is less correlated than age or alcohol with the increase in cancer cases, but that the value is very high from the outset. In other words, a person who smokes little is almost as likely to develop cancer of the oesophagus as a person who smokes much more, unlike age or alcohol, for which the probability increases gradually.
+In the end, as shown above, we see that tobacco is less correlated than age or alcohol with the increase in cancer cases, but that the value is very high from the outset. In other words, a person who smokes little is almost as likely to develop cancer of the œsophagus as a person who smokes much more, unlike age or alcohol, for which the probability increases gradually.
 
 
 ## Conclusion
