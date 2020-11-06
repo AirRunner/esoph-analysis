@@ -162,10 +162,11 @@ In our case, we will use the `xtabs` function in order to build a contingency ta
 
 #### Age test
 
-As we want to test the independence of cases proportion and age, we should create two factors, one combining `ncases` and `ncontrols`, and the other being `agegp`. The independence $\chi^2$ test will be performed between these two factors.
+As we want to test the independence of cases proportion and age, we should create two factors, one combining `ncases` and `ncontrols`, and the other being `agegp`. With the built-in function `chisq.test`, the independence $\chi^2$ test will be performed between these two factors.
 
 ```{r age_table}
 age_table <- xtabs(cbind(ncases, ncontrols) ~ agegp, data=esoph)
+age_table
 chisq.test(age_table)
 ```
 
@@ -178,6 +179,7 @@ In the same way as above, we can perform a $\chi^2$ test to reject or not the hy
 
 ```{r alc_table}
 alc_table <- xtabs(cbind(ncases, ncontrols) ~ alcgp, data=esoph)
+alc_table
 chisq.test(alc_table)
 ```
 
@@ -187,6 +189,7 @@ As the p-value is even lower than $2.2\cdot10^{-16}$, it is much lower than the 
 
 ```{r tob_table}
 tob_table <- xtabs(cbind(ncases, ncontrols) ~ tobgp, data=esoph)
+tob_table
 chisq.test(tob_table)
 ```
 
