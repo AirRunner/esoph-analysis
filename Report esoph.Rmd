@@ -6,7 +6,7 @@ output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo=TRUE, message=FALSE, warning=FALSE)
 ```
 
 ## Discovering the dataset
@@ -41,6 +41,7 @@ In fact, we can see using the `tapply` R function, which is a `group_by`, that f
 
 On the basis of these observations, we can conclude that we will not be able to base our calculations on the numbers of cases and controls, in particular with regard to the computation of correlation indices between the different variables.
 
+\pagebreak
 
 ## Visualising the data
 
@@ -108,6 +109,7 @@ For instance, the alcohol group `0-39` has $415$ controls, but only $6.99%$ of t
 
 To finish with, case proportions seem to be more consistent to conduct further analysis, and we will base our computations on this model. The only drawback to this system is that with a different number of controls, the data collected, and therefore the proportions calculated at the same time, will be of very different accuracy. To come back to the previous example, the `120+` group does have $67.16%$ positive cases, but this proportion could well be revised downwards following further measurements. The `0-39` group has many more measurements and therefore presents more accurate data, which can therefore be relied on more confidently.
 
+\pagebreak
 
 ## Hypothesis testing
 
@@ -140,6 +142,7 @@ On the graphs, for instance, we clearly see that the proportion of positive case
 But more generally, a clear trend seems to be emerging for all three variables: cancer cases seem to increase with age or consumption. This would mean that the rate of positive cases would be correlated with the variables.
 
 At this stage, we can therefore state three questions:
+
 - Does age favour the development of œsophageal cancer ?
   - $H_0$: age and cases proportion ar enot correlated, i.e. correlation factor is below $0.5$.
   - $H_a$: age and cases proportion correlation factor is higher or equal to $0.5$.
@@ -205,7 +208,8 @@ print(cleanTable(esoph_prop_corr, 0.5), digits=3, na.print=".")
 # Graphically
 library(corrplot)
 esoph_prop_corr_plot <- cleanTable(esoph_prop_corr, NULL, 0.0)
-corrplot(as.matrix(esoph_prop_corr_plot), type="full", order="hclust", tl.col="black", tl.srt=45)
+corrplot(as.matrix(esoph_prop_corr_plot), type="full",
+         order="hclust", tl.col="black", tl.srt=45)
 ```
 
 We do see that age and alcohol are correlated with the proportion of cases, as expected. But surprisingly, it seems that tobacco is not correlated with the proportions of cases, contrary to what seemed to appear previously.
@@ -260,6 +264,7 @@ Secondly, for the first two age categories, there are very few cases of œsophag
 
 We may therefore have here a first clue to understanding the non-correlation between tobacco consumption and the proportion of cases. Cases of cancer are said to be immediately high when consumption is low, and therefore to increase less following consumption of tobacco than alcohol, for example.
 
+\pagebreak
 
 ## Building a model
 
@@ -284,16 +289,16 @@ The p-value indicates if the model fits the data well or not. Here, we can say t
 y_alc <- as.numeric(esoph_prop$alcohol) - 1
 y_tob <- as.numeric(esoph_prop$tobacco) - 1
 
-age_linear <- ggplot(esoph_prop, aes(x=y_age, y=X)) + geom_point(size=1) + geom_smooth(method="lm") +
-  stat_regline_equation(label.x=0.1, label.y=0.85) +
+age_linear <- ggplot(esoph_prop, aes(x=y_age, y=X)) + geom_point(size=1) +
+  geom_smooth(method="lm") + stat_regline_equation(label.x=0.1, label.y=0.85) +
   scale_x_continuous(labels=levels(esoph_prop$age)) +
   labs(x="Age Groups", y="Proportion of cancers (%)") + theme_bw()
-alc_linear <- ggplot(esoph_prop, aes(x=y_alc, y=X)) + geom_point(size=1) + geom_smooth(method="lm") +
-  stat_regline_equation(label.x=0.1, label.y=0.8) +
+alc_linear <- ggplot(esoph_prop, aes(x=y_alc, y=X)) + geom_point(size=1) +
+  geom_smooth(method="lm") + stat_regline_equation(label.x=0.1, label.y=0.8) +
   scale_x_continuous(labels=levels(esoph_prop$alcohol)) +
   labs(x="Alcohol Groups", y="Proportion of cancers (%)") + theme_bw()
-tob_linear <- ggplot(esoph_prop, aes(x=y_tob, y=X)) + geom_point(size=1) + geom_smooth(method="lm") +
-  stat_regline_equation(label.x=0.1, label.y=0.65) +
+tob_linear <- ggplot(esoph_prop, aes(x=y_tob, y=X)) + geom_point(size=1) +
+  geom_smooth(method="lm") + stat_regline_equation(label.x=0.1, label.y=0.65) +
   scale_x_continuous(labels=levels(esoph_prop$tobacco)) +
   labs(x="Tobacco Groups", y="Proportion of cancers (%)") + theme_bw()
 
@@ -308,6 +313,7 @@ However, we can notice that the error areas are relatively large, this is becaus
 
 
 
+\pagebreak
 
 ## Conclusion
 
