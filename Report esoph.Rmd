@@ -111,6 +111,9 @@ To finish with, case proportions seem to be more consistent to conduct further a
 
 ## Hypothesis testing
 
+In this section, we can to confirm or not some hypothesis about the dataset. In order to do this, we will define null hypotheses, de noted $H_0$, and alternative hypotheses, denoted $H_a$.
+The null hypothesis is a default position that there is no relationship between two variables, and the alternative hypothesis is, on the contrary, that there is a specific relationship between those variables.
+
 ### State hypothesis
 
 We have seen that, in order to carry out our analysis, it is preferable for us to work with proportions of positive cases. Now, let's try to plot these proportions graphically by age, alcohol and tobacco groups in order to begin our analysis and state our initial hypotheses.
@@ -122,13 +125,13 @@ library(ggpubr)
 
 age_plot <- ggplot(as.data.frame(age_proportions), aes(x=c(0:5), y=age_proportions)) +
   geom_line(col="blue") + scale_x_continuous(labels=levels(esoph$age)) +
-  labs(x="Age", y="Global percentage")
+  labs(title="Proportion of cases by age", x="Age", y="Global percentage")
 alc_plot <- ggplot(as.data.frame(alc_proportions), aes(x=c(0:3), y=alc_proportions)) +
   geom_line(col="blue") + scale_x_continuous(labels=levels(esoph$alcgp)) +
-  labs(x="Alcohol", y="Global percentage")
+  labs(title="Proportion of cases by alcohol", x="Alcohol", y="Global percentage")
 tob_plot <- ggplot(as.data.frame(tob_proportions), aes(x=c(0:3), y=tob_proportions)) +
   geom_line(col="blue") + scale_x_continuous(labels=levels(esoph$tobgp)) +
-  labs(x="Tobacco", y="Global percentage")
+  labs(title="Proportion of cases by tobacco", x="Tobacco", y="Global percentage")
 
 ggarrange(age_plot, alc_plot, tob_plot)
 ```
@@ -136,172 +139,174 @@ ggarrange(age_plot, alc_plot, tob_plot)
 On the graphs, for instance, we clearly see that the proportion of positive cases is higher when the person is old. However, we see that the 75+ group doesn't have so much cases, which can maybe be explained by the fact that people with cancer die before.
 But more generally, a clear trend seems to be emerging for all three variables: cancer cases seem to increase with age or consumption. This would mean that the rate of positive cases would be correlated with the variables.
 
-At this stage, we can therefore state three hypotheses:
+At this stage, we can therefore state three questions:
 - Does age favour the development of œsophageal cancer ?
-  - $H_0$: age and cases proportion are independent.
-  - $H_a$: age and cases proportion are correlated.
+  - $H_0$: age and cases proportion ar enot correlated, i.e. correlation factor is below $0.5$.
+  - $H_a$: age and cases proportion correlation factor is higher or equal to $0.5$.
 - Do smoking habits favour the development of œsophageal cancer ?
-  - $H_0$: alcohol and cases proportion are independent.
-  - $H_a$: alcohol and cases proportion are correlated.
+  - $H_0$: alcohol and cases proportion correlation factor is below $0.5$.
+  - $H_a$: alcohol and cases proportion correlation factor is higher or equal to $0.5$.
 - Do alcoholic habits favour the development of œsophageal cancer ?
-  - $H_0$: tobacco and cases proportion are independent.
-  - $H_a$: tobacco and cases proportion are correlated.
+  - $H_0$: tobacco and cases proportion correlation factor is below $0.5$.
+  - $H_a$: tobacco and cases proportion correlation factor is higher or equal to $0.5$.
 
-In order to answer these questions, we need to test the null hypotheses $H_0$. To do this, we are going to carry out what are called $\chi^2$ tests.
+In order to answer these questions, we need to test the null hypotheses $H_0$, which is the default position that there is no relationship between the variables. To do this, we are going to carry out significance tests of the correlations.
 
 ### Hypothesis verification
 
-First, let's explain briefly what a $\chi^2$ test is about.
-Let $o_{ij}$ is the frequency observed at line $i$ of `prop_cases` and at line $j$ of `age`, and $c_{ij}$ is the calculated frequency expected for the null hypothesis $H_0$ (i.e. if the variables are independent).
-The null hypothesis must be rejected if the p-value, i.e. the probability of finding the expected value, determined by the following $\chi^2$ test, is lower than the significance level $\alpha$, generally $0.05$.
+First, let's explain briefly what a significance test is about.
+Eventually, the null hypothesis must be rejected if the p-value determined by the test is lower than the significance level $\alpha$, generally $0.05$. The p-value is the probability of finding the test-statistic value. The latest is the value expected by the null hypothesis, i.e. how closely the distribution matches the null hypothesis. This value is calculated as follows:
 
-$\chi^2 = \sum_{i,j}\frac{\left(o_{ij} - c_{ij}\right)^2}{c_{ij}}$
+$t = \frac{\overline x - \mu_0}{\frac{s}{\sqrt n}}$
 
-For a $\chi^2$ test to be accurate, the given values should not be too small, otherwise R will warn it. A solution for that could be bootstrapping, i.e. simulating a certain number of samples according to the original dataset, in order to further enhance the accuracy of the test. This method is directly integrated in the $\chi^2$ test function of R, with attribute `simulate.p.value`.
-In our case, we will use the `xtabs` function in order to build a contingency table with frequencies of data we are interested in.
+Now that the goals are defined, we can start analysing. First of all, we will build a new cleaned dataset called `esoph_prop`, in which all data will be quantitative and where cases will be given by proportion of controls. Therefore, we create a column `cases`, which represents the positive diagnosed cases for each group combination, normalised by number of controls.
 
-#### Age test
+```{r clean}
+age <- as.numeric(esoph$agegp)
+alcohol <- as.numeric(esoph$alcgp)
+tobacco <- as.numeric(esoph$tobgp)
+cases <- esoph$ncases / esoph$ncontrols
 
-As we want to test the independence of cases proportion and age, we should create two factors, one combining `ncases` and `ncontrols`, and the other being `agegp`. With the built-in function `chisq.test`, the independence $\chi^2$ test will be performed between these two factors.
-
-```{r age_table}
-age_table <- xtabs(cbind(ncases, ncontrols) ~ agegp, data=esoph)
-age_table
-chisq.test(age_table)
-```
-
-The test carried out with sufficient precision. As explained above, the most important result is the p-value. Here, the p-value $2.224\cdot10^{-13}$ is much lower than the $5%$ significance level, so we can reject the null hypothesis that the age is independent of the œsophageal cancer cases. This therefore shows a clear relationship between the age and œsophageal cancers.
-Before continuing, we must be careful not to interpret this conclusion in the wrong way. This correlation does not mean that there is a cause and effect relationship, and could even come about by chance.
-
-#### Alcohol test
-
-In the same way as above, we can perform a $\chi^2$ test to reject or not the hypothesis.
-
-```{r alc_table}
-alc_table <- xtabs(cbind(ncases, ncontrols) ~ alcgp, data=esoph)
-alc_table
-chisq.test(alc_table)
-```
-
-As the p-value is even lower than $2.2\cdot10^{-16}$, it is much lower than the $5%$ significance level and we can reject the null hypothesis that the alcohol habits are independent of the œsophageal cancer cases. This therefore shows a clear relationship between the alcohol habits and œsophageal cancers.
-
-#### Tobacco test
-
-```{r tob_table}
-tob_table <- xtabs(cbind(ncases, ncontrols) ~ tobgp, data=esoph)
-tob_table
-chisq.test(tob_table)
-```
-
-As the p-value $0.0003702$ is much lower than the $5%$ significance level, we can reject the null hypothesis that the alcohol habits are independent of the œsophageal cancer cases. This therefore shows a clear relationship between the alcohol habits and œsophageal cancers.
-
-To finish with, the three correlations has been demonstrated. Note that the p-values correspond to what we could expect from the graphs above, i.e. for example alcohol is very much correlated with positive cases, while tobacco is a bit less.
-However, what does this really mean? As stated above, a correlation between two variables is not sufficient to claim causality. Many factors can influence an observation. Let us imagine, for example, that a sociological study shows that smokers become heavy drinkers with age. In this case, it could very well be that tobacco as well as age influence cases of œsophageal cancer, but not alcohol at all. However, because of this sociological fact, we measure a very strong correlation between alcohol consumption and cases of oesophageal cancer.
-A correlation, therefore, is not sufficient. Thus, in addition to the previous tests, it would be interesting to look for links between alcoholism and smoking in cases of cancer.
-
-
-### Tobacco impact depending on alchohol
-
-We want to know the impact of tobacco on cancer frequency depending on alcohol consumption.
-
-For that, we will first need to build a new dataset in which each proportion will be calculated. Therefore, we create a column `prop_cases`, which represents the positive diagnosed cases for each group combination, normalised by number of controls.
-
-```{r esoph_prop}
-# Columns
-age <- esoph$agegp
-alcohol <- esoph$alcgp
-tobacco <- esoph$tobgp
-prop_cases <- esoph$ncases / esoph$ncontrols
-
-# Dataset
-esoph_prop <- data.frame(age, alcohol, tobacco, prop_cases)
-summary(esoph_prop$prop_cases)
+esoph_prop <- data.frame(age, alcohol, tobacco, cases)
+summary(esoph_prop$cases)
 ```
 
 In fact, we see that this column represents a proportion, from $0$ to $1$, with a mean of $34.68%$ positive cases.
-Now, let's build two bar plots with the proportion of cases depending on alcohol and tobacco consumption.
 
-```{r alc_tob}
-alc_tob <- ggplot(esoph_prop, aes(alcohol, prop_cases, fill=tobacco)) +
-  geom_bar(stat="identity", position="dodge") +
-  labs(title="Tobacco by alcohol", y="Cases proportion")
-tob_alc <- ggplot(esoph_prop, aes(tobacco, prop_cases, fill=alcohol)) +
-  geom_bar(stat="identity", position="dodge") +
-  labs(title="Alcohol by tobacco", y="Cases proportion")
+Now, we can calculate correlations between all three group variables and cases proportion. Let's first build and display a correlation factors matrix using default pearson's correlation.
 
-ggarrange(alc_tob, tob_alc)
+```{r corr}
+esoph_prop_corr <- cor(esoph_prop)
+esoph_prop_corr
 ```
 
-First of all, it can be seen that, at low doses, alcohol consumption has less effect than tobacco on cancer cases. However, at higher doses, the effects of alcohol catch up with those of tobacco.
-Indeed, the two graphs show that high alcohol consumption (over 80 g/day) almost always leads to cancer of the œsophagus, while tobacco seems to have a lower impact alone, up to 60% when no alcohol is consumed. 
-Tobacco therefore has no impact on cancer of the oesophagus above 80 g of alcohol consumed per day, as cancer certainly already exists, but still has a significant impact at lower doses compared to alcohol.
+Nous remarquons tout de suite que la diagonale de la matrice est composée essentiellement de 1, ce qui est tout à fait normal car ce sont des corrélations entre mêmes variables.
+Aussi, les corrélations entre les trois variables qualitatives que sont l'âge, l'alcool et le tabac n'ont aucune valeur ici. En effet, ce dataset est intéressant pour ses mesures de nombre de cas de cancer, par contre les mesures ont été faites de façon très homogène entre ces trois variables. Autrement dit, il est censé y avoir des mesures pour chaque combinaison de ces variables, c'est pour cela que leurs corrélations sont presque nulles.
+
+We can also display the matrix on a more clear way as below, either by masking low values or graphically.
+
+```{r corrplot}
+cleanTable <- function(table, threshold, subst=NA, rev=FALSE) {
+  for (i in seq(1, length(table[,1]))) {
+		for (j in seq(1, length(table[1,]))) {
+		  if (i == j ||
+		      !is.null(threshold) &&
+		      xor(rev, table[i, j] > -threshold && table[i, j] < threshold)) {
+				table[i, j] <- subst
+			}
+		}
+	}
+	return (table)
+}
+
+# Masking low values
+print(cleanTable(esoph_prop_corr, 0.5), digits=3, na.print=".")
+
+# Graphically
+library(corrplot)
+esoph_prop_corr_plot <- cleanTable(esoph_prop_corr, NULL, 0.0)
+corrplot(as.matrix(esoph_prop_corr_plot), type="full", order="hclust", tl.col="black", tl.srt=45)
+```
+
+We do see that age and alcohol are correlated with the proportion of cases, as expected. But surprisingly, it seems that tobacco is not correlated with the proportions of cases, contrary to what seemed to appear previously.
+As seen previously, to be able to reject or not the null hypothesis, we must calculate the p-values. For each couple of variables, we can perform a correlation significance test, as follows for age and cases.
+
+```{r p-values}
+cor.test(esoph_prop$age, esoph_prop$cases)
+```
+
+Here, the confidence interval at $95%$ is $\left[0.364, 0.668\right]$. With a correlation factor of $0.533$, the confidence interval is fit. In fact, the determined p-value is $8.884\cdot10^{-8}$, which is way lower than the significance level $\alpha=0.05$. Hence, we can reject the null hypothesis that the age is independent of the œsophageal cancer cases. This therefore shows a clear relationship between the age and œsophageal cancers.
+Before continuing, we must be careful not to interpret this conclusion in the wrong way. This correlation does not mean that there is a cause and effect relationship, and could even come about by chance.
+
+Let's compute the p-values in a more efficient way (i.e. not one by one), using the `rcorr` function.
+
+```{r rcorr}
+library(Hmisc)
+print(cleanTable(rcorr(as.matrix(esoph_prop))$P, 0.05, rev=TRUE), digits=3, na.print=".")
+```
+
+The result is definitive: the previously identified correlations are significant, and we can reject the null hypotheses that age and alcohol are not correlated with the proportion of cases.
+However, the tobacco consumption seems not to be sufficiently correlated with cases proportions to reject the associated null hypothesis. We will try to explain this phenomenon later.
+
+There is one thing to be aware of, however, namely that, as stated above, a correlation between two variables is not sufficient to claim causality. Many factors can influence an observation. Let us imagine, for example, that a sociological study shows that smokers become heavy drinkers with age. In this case, it could very well be that tobacco as well as age influence cases of œsophageal cancer, but not alcohol at all. However, because of this sociological fact, we measure a very strong correlation between alcohol consumption and cases of œsophageal cancer.
+
+After carrying out these last tests, we can confirm that tobacco consumption is not correlated with the proportion of cases of oesophageal cancer. To begin the investigation, let us try to understand how the three variables influence each other.
+
+
+### Influences of the variables on each other
+
+To analyse the influence that these variables have on each other, we will construct three graphs combining the data from one variable according to the categories of another. We could construct all six possible graphs, but these three are sufficient.
+
+```{r age_alc_tob}
+esoph_prop_qual <- data.frame(esoph$agegp, esoph$alcgp, esoph$tobgp, esoph_prop$cases)
+names(esoph_prop_qual) <- c("age", "alcohol", "tobacco", "cases")
+
+age_alc <- ggplot(esoph_prop_qual, aes(alcohol, cases, fill=age)) +
+  geom_bar(stat="identity", position="dodge") +
+  labs(title="Age by alcohol", y="Cases proportion")
+alc_tob <- ggplot(esoph_prop_qual, aes(tobacco, cases, fill=alcohol)) +
+  geom_bar(stat="identity", position="dodge") +
+  labs(title="Alcohol by tobacco", y="Cases proportion")
+age_tob <- ggplot(esoph_prop_qual, aes(tobacco, cases, fill=age)) +
+  geom_bar(stat="identity", position="dodge") +
+  labs(title="Age by tobacco", y="Cases proportion")
+
+ggarrange(age_alc, alc_tob, age_tob)
+```
+
+Let's start with the impact of age as a function of alcohol consumption. We see that from the second alcohol category, 40-79g/day, there are already 50% or more cases of œsophageal cancer for all age categories except the first two, and that from the third category, 80-119g/day, the cancer rate is almost always 100% from the age of 45 onwards. Moreover, from an alcohol consumption of 80g per day, almost all cases develop cancer, in any age group or tobacco consumption. This shows the significant impact of heavy alcohol consumption on cancer cases, but also that the age of the person will strongly determine the resistance of his or her body, and in particular that people under 44 years of age suffer much less from it.
+
+Secondly, for the first two age categories, there are very few cases of œsophageal cancer, apart from alcohol consumption exceeding 119g per day. Conversely, as far as tobacco consumption is concerned, cancer cases are very high from the first age category onwards. Indeed, even at low doses of tobacco, and regardless of alcohol consumption or the age of the person, cases of cancer are already high. Moreover, certain data seem to be missing for the first age group.
+
+We may therefore have here a first clue to understanding the non-correlation between tobacco consumption and the proportion of cases. Cases of cancer are said to be immediately high when consumption is low, and therefore to increase less following consumption of tobacco than alcohol, for example.
 
 
 ## Building a model
 
-Now that we have shown the correlations between the variables, let's try to go further. We can build a model on these data, allowing us to predict a probability of cancer cases according to different criteria. As we saw earlier, the variables are highly correlated with cancer cases, so a linear model might be appropriate.
+Now that we have shown the correlations between the variables let's try to go further, in order to confirm our hypothesis concerning tobacco consumption.
+For that, we can build a model on these data, allowing us to predict a probability of cancer cases according to different criteria. Let's first try to build a linear model and see if it is appropriate.
 
-### Age model
+### Linear model
 
-Let's build a linear model on age correlation.
+Let's first build a linear model on age correlation.
 
-```{r age_model}
-X <- esoph_prop$prop_cases
+```{r age_linear__model}
+X <- esoph_prop$cases
 y_age <- as.numeric(esoph_prop$age) - 1
 
-age_model <- lm(X ~ y_age)
-summary(age_model)
-```
-The model shows different coefficients:
-- estimates: estimated effect of age on proportion of cases
-- standard error of the estimated values
-- t-statistic value: how closely the distribution matches the null hypothesis
-- p-value: probability of finding the t-value if $H_0$ were true
-
-So the p-value indicates if the model fits the data well or not. Here, we can say that there is a significant positive relationship between age group and cancer proportion (p-value << $0.001$), with an increase in cancer proportion of $0.11547$ ($11.547%$) for every unit increase in age group. We can visualise this linear regression below.
-
-```{r age_regression}
-ggplot(esoph_prop, aes(x=y_age, y=X)) + geom_point() + geom_smooth(method="lm") +
-  stat_regline_equation(label.x=0.01, label.y=0.35) +
-  scale_x_continuous(labels=levels(esoph_prop$age)) +
-  labs(x="Age Groups", y="Proportion of cancers (%)") + theme_bw()
+age_linear_model <- lm(X ~ y_age)
+summary(age_linear_model)
 ```
 
-We can notice that the error area is relatively large, this is because the the data is not sufficiently linear to better fit the model.
+The p-value indicates if the model fits the data well or not. Here, we can say that there is a significant positive relationship between age group and cancer proportion (p-value << $0.001$), with an increase in cancer proportion of $0.11547$ ($11.547%$) for every unit increase in age group. Then, we can build the models for alcohol and tobacco and visualise the three linear regressions below.
 
-### Alcohol model
-
-In the same way, we can build an alcohol model.
-
-```{r alc_model}
+```{r linear_regressions}
 y_alc <- as.numeric(esoph_prop$alcohol) - 1
-
-alc_model <- lm(X ~ y_alc)
-summary(alc_model)
-```
-```{r alc_regression}
-ggplot(esoph_prop, aes(x=y_alc, y=X)) + geom_point() + geom_smooth(method="lm") +
-  stat_regline_equation(label.x=0.2, label.y=0.35) +
-  scale_x_continuous(labels=levels(esoph_prop$alcohol)) +
-  labs(x="Alcohol Groups", y="Proportion of cancers (%)") + theme_bw()
-```
-
-### Tobacco model
-
-```{r tob_model}
 y_tob <- as.numeric(esoph_prop$tobacco) - 1
 
-tob_model <- lm(X ~ y_tob)
-summary(tob_model)
-```
-```{r tob_regression}
-ggplot(esoph_prop, aes(x=y_tob, y=X)) + geom_point() + geom_smooth(method="lm") +
-  stat_regline_equation(label.x=0.2, label.y=0.5) +
+age_linear <- ggplot(esoph_prop, aes(x=y_age, y=X)) + geom_point(size=1) + geom_smooth(method="lm") +
+  stat_regline_equation(label.x=0.1, label.y=0.85) +
+  scale_x_continuous(labels=levels(esoph_prop$age)) +
+  labs(x="Age Groups", y="Proportion of cancers (%)") + theme_bw()
+alc_linear <- ggplot(esoph_prop, aes(x=y_alc, y=X)) + geom_point(size=1) + geom_smooth(method="lm") +
+  stat_regline_equation(label.x=0.1, label.y=0.8) +
+  scale_x_continuous(labels=levels(esoph_prop$alcohol)) +
+  labs(x="Alcohol Groups", y="Proportion of cancers (%)") + theme_bw()
+tob_linear <- ggplot(esoph_prop, aes(x=y_tob, y=X)) + geom_point(size=1) + geom_smooth(method="lm") +
+  stat_regline_equation(label.x=0.1, label.y=0.65) +
   scale_x_continuous(labels=levels(esoph_prop$tobacco)) +
   labs(x="Tobacco Groups", y="Proportion of cancers (%)") + theme_bw()
+
+ggarrange(age_linear, alc_linear, tob_linear)
 ```
 
-In the end, as shown above, we see that tobacco is less correlated than age or alcohol with the increase in cancer cases, but that the value is very high from the outset. In other words, a person who smokes little is almost as likely to develop cancer of the œsophagus as a person who smokes much more, unlike age or alcohol, for which the probability increases gradually.
+One more time, we can confirm that tobacco is less correlated than age or alcohol with the increase in cancer cases, but that the value is very high from the outset. In other words, a person who smokes little seems to be almost as likely to develop cancer of the œsophagus as a person who smokes much more, unlike age or alcohol, for which the probability increases gradually.
+
+However, we can notice that the error areas are relatively large, this is because the the data is not sufficiently linear to better fit the model. Moreover, for all three models, the $R^2$ value is very low. For instance in the age model, it is of about $0.28$, while a correct $R^2$ should be higher than $0.8$. This shows indeed that the previous models are not accurate enough. Thus, we will need to build logistic regressions.
+
+### Logistic regression
+
+
 
 
 ## Conclusion
