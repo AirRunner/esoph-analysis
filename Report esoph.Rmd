@@ -16,7 +16,12 @@ Our dataset comes from a case-control study of œsophageal cancer conducted in I
 To begin with, let's explore the esoph dataset. With R, we can display the first 8 lines, and its dimensions.
 
 ```{r head}
-head(esoph, 8)
+# Show the dataset shuffled, so that we see different age groups
+set.seed(1)
+random <- sample(nrow(esoph))
+shuffled <- esoph[random,]
+head(shuffled, 10)
+
 cat("Number of combinations: ", dim(esoph)[1], "\nNumber of persons controlled: ",
     sum(esoph$ncontrols))
 ```
@@ -63,45 +68,45 @@ A certainly more reasonable way of analysing this dataset is to base our calcula
 
 ```{r proportions_stacks}
 # Age
-age_cases <- tapply(esoph$ncases, esoph$agegp, sum)
-age_controls <- tapply(esoph$ncontrols, esoph$agegp, sum)
-non_age_cases <- age_controls - age_cases
-age_proportions <- age_cases / age_controls * 100
-age_ylim <- c(0, 1.1 * max(age_controls))
+age.cases <- tapply(esoph$ncases, esoph$agegp, sum)
+age.controls <- tapply(esoph$ncontrols, esoph$agegp, sum)
+non_age.cases <- age.controls - age.cases
+age.proportions <- age.cases / age.controls * 100
+age.ylim <- c(0, 1.1 * max(age.controls))
 
 # Alcohol
-alc_cases <- tapply(esoph$ncases, esoph$alcgp, sum)
-alc_controls <- tapply(esoph$ncontrols, esoph$alcgp, sum)
-non_alc_cases <- alc_controls - alc_cases
-alc_proportions <- alc_cases / alc_controls * 100
-alc_ylim <- c(0, 1.1 * max(alc_controls))
+alc.cases <- tapply(esoph$ncases, esoph$alcgp, sum)
+alc.controls <- tapply(esoph$ncontrols, esoph$alcgp, sum)
+non_alc.cases <- alc.controls - alc.cases
+alc.proportions <- alc.cases / alc.controls * 100
+alc.ylim <- c(0, 1.1 * max(alc.controls))
 
 # Tobacco
-tob_cases <- tapply(esoph$ncases, esoph$tobgp, sum)
-tob_controls <- tapply(esoph$ncontrols, esoph$tobgp, sum)
-non_tob_cases <- tob_controls - tob_cases
-tob_proportions <- tob_cases / tob_controls * 100
-tob_ylim <- c(0, 1.1 * max(tob_controls))
+tob.cases <- tapply(esoph$ncases, esoph$tobgp, sum)
+tob.controls <- tapply(esoph$ncontrols, esoph$tobgp, sum)
+non_tob.cases <- tob.controls - tob.cases
+tob.proportions <- tob.cases / tob.controls * 100
+tob.ylim <- c(0, 1.1 * max(tob.controls))
 
 # Plots
 legend <- c("Cases", "Non cases")
 colours <- c("#447EB4", "#EDF0F1")
 ylab <- "Number of controls"
 
-age_plot <- barplot(rbind(age_cases, non_age_cases), ylim=age_ylim, legend=legend,
+age.plot <- barplot(rbind(age.cases, non_age.cases), ylim=age.ylim, legend=legend,
                 col=colours, xlab="Age group", ylab=ylab,
                 main="Percentage of cancer cases within controls by age")
-text(x=age_plot, y=age_controls, label=paste(round(age_proportions, 2), "%"), pos=3)
+text(x=age.plot, y=age.controls, label=paste(round(age.proportions, 2), "%"), pos=3)
 
-alc_plot <- barplot(rbind(alc_cases, non_alc_cases), ylim=alc_ylim, legend=legend,
+alc.plot <- barplot(rbind(alc.cases, non_alc.cases), ylim=alc.ylim, legend=legend,
                 col=colours, xlab="Alcohol group", ylab=ylab,
                 main="Percentage of cancer cases within controls by alcohol")
-text(x=alc_plot, y=alc_controls, label=paste(round(alc_proportions, 2), "%"), pos=3)
+text(x=alc.plot, y=alc.controls, label=paste(round(alc.proportions, 2), "%"), pos=3)
 
-tob_plot <- barplot(rbind(tob_cases, non_tob_cases), ylim=tob_ylim, legend=legend,
+tob.plot <- barplot(rbind(tob.cases, non_tob.cases), ylim=tob.ylim, legend=legend,
                 col=colours, xlab="Tobacco group", ylab=ylab,
                 main="Percentage of cancer cases within controls by tobacco")
-text(x=tob_plot, y=tob_controls, label=paste(round(tob_proportions, 2), "%"), pos=3)
+text(x=tob.plot, y=tob.controls, label=paste(round(tob.proportions, 2), "%"), pos=3)
 ```
 
 These three bar plots show, for each group of the concerned factor, the proportion of positive and negative cases within the overall controls. As we saw, and as we still see on these plots, the controls are not equitably distributed, but looking at the proportion of cases within those controls is more consistent for our data analysis. In fact, what matters is not how many controls have been done for a given age group for example, but indeed the percentage of positive cancer cases measured.
@@ -125,17 +130,17 @@ To do this, let's reuse the global percentages previously calculated for each va
 library(ggplot2)
 library(ggpubr)
 
-age_plot <- ggplot(as.data.frame(age_proportions), aes(x=c(0:5), y=age_proportions)) +
+age.plot <- ggplot(as.data.frame(age.proportions), aes(x=c(0:5), y=age.proportions)) +
   geom_line(col="blue") + scale_x_continuous(labels=levels(esoph$age)) +
   labs(title="Proportion of cases by age", x="Age", y="Global percentage")
-alc_plot <- ggplot(as.data.frame(alc_proportions), aes(x=c(0:3), y=alc_proportions)) +
+alc.plot <- ggplot(as.data.frame(alc.proportions), aes(x=c(0:3), y=alc.proportions)) +
   geom_line(col="blue") + scale_x_continuous(labels=levels(esoph$alcgp)) +
   labs(title="Proportion of cases by alcohol", x="Alcohol", y="Global percentage")
-tob_plot <- ggplot(as.data.frame(tob_proportions), aes(x=c(0:3), y=tob_proportions)) +
+tob.plot <- ggplot(as.data.frame(tob.proportions), aes(x=c(0:3), y=tob.proportions)) +
   geom_line(col="blue") + scale_x_continuous(labels=levels(esoph$tobgp)) +
   labs(title="Proportion of cases by tobacco", x="Tobacco", y="Global percentage")
 
-ggarrange(age_plot, alc_plot, tob_plot)
+ggarrange(age.plot, alc.plot, tob.plot)
 ```
 
 On the graphs, for instance, we clearly see that the proportion of positive cases is higher when the person is old. However, we see that the 75+ group doesn't have so much cases, which can maybe be explained by the fact that people with cancer die before.
@@ -162,7 +167,7 @@ Eventually, the null hypothesis must be rejected if the p-value determined by th
 
 $t = \frac{\overline x - \mu_0}{\frac{s}{\sqrt n}}$
 
-Now that the goals are defined, we can start analysing. First of all, we will build a new cleaned dataset called `esoph_prop`, in which all data will be quantitative and where cases will be given by proportion of controls. Therefore, we create a column `cases`, which represents the positive diagnosed cases for each group combination, normalised by number of controls.
+Now that the goals are defined, we can start analysing. First of all, we will build a new cleaned dataset called `esoph.prop`, in which all data will be quantitative and where cases will be given by proportion of controls. Therefore, we create a column `cases`, which represents the positive diagnosed cases for each group combination, normalised by number of controls.
 
 ```{r clean}
 age <- as.numeric(esoph$agegp)
@@ -170,21 +175,22 @@ alcohol <- as.numeric(esoph$alcgp)
 tobacco <- as.numeric(esoph$tobgp)
 cases <- esoph$ncases / esoph$ncontrols
 
-esoph_prop <- data.frame(age, alcohol, tobacco, cases)
-summary(esoph_prop$cases)
+esoph.prop <- data.frame(age, alcohol, tobacco, cases)
+summary(esoph.prop$cases)
 ```
 
 In fact, we see that this column represents a proportion, from $0$ to $1$, with a mean of $34.68%$ positive cases.
+Note that, unlike the previous graphs here, we have calculated the proportions for each combination, for greater precision, and not the overall proportion for each variable.
 
 Now, we can calculate correlations between all three group variables and cases proportion. Let's first build and display a correlation factors matrix using default pearson's correlation.
 
 ```{r corr}
-esoph_prop_corr <- cor(esoph_prop)
-esoph_prop_corr
+esoph.prop.corr <- cor(esoph.prop)
+esoph.prop.corr
 ```
 
-Nous remarquons tout de suite que la diagonale de la matrice est composée essentiellement de 1, ce qui est tout à fait normal car ce sont des corrélations entre mêmes variables.
-Aussi, les corrélations entre les trois variables qualitatives que sont l'âge, l'alcool et le tabac n'ont aucune valeur ici. En effet, ce dataset est intéressant pour ses mesures de nombre de cas de cancer, par contre les mesures ont été faites de façon très homogène entre ces trois variables. Autrement dit, il est censé y avoir des mesures pour chaque combinaison de ces variables, c'est pour cela que leurs corrélations sont presque nulles.
+We immediately notice that the diagonal of the matrix is essentially composed of 1, which is quite normal because these are correlations between the same variables.
+Also, the correlations between the three qualitative variables of age, alcohol and tobacco have no value here. In fact, this dataset is interesting for its measurements of the number of cancer cases, but the measurements were made in a very homogeneous way between these three variables. In other words, there are supposed to be measures for each combination of these variables, which is why their correlations are almost null.
 
 We can also display the matrix on a more clear way as below, either by masking low values or graphically.
 
@@ -203,12 +209,12 @@ cleanTable <- function(table, threshold, subst=NA, rev=FALSE) {
 }
 
 # Masking low values
-print(cleanTable(esoph_prop_corr, 0.5), digits=3, na.print=".")
+print(cleanTable(esoph.prop.corr, 0.5), digits=3, na.print=".")
 
 # Graphically
 library(corrplot)
-esoph_prop_corr_plot <- cleanTable(esoph_prop_corr, NULL, 0.0)
-corrplot(as.matrix(esoph_prop_corr_plot), type="full",
+esoph.prop.corr.plot <- cleanTable(esoph.prop.corr, NULL, 0.0)
+corrplot(as.matrix(esoph.prop.corr.plot), type="full",
          order="hclust", tl.col="black", tl.srt=45)
 ```
 
@@ -216,7 +222,7 @@ We do see that age and alcohol are correlated with the proportion of cases, as e
 As seen previously, to be able to reject or not the null hypothesis, we must calculate the p-values. For each couple of variables, we can perform a correlation significance test, as follows for age and cases.
 
 ```{r p-values}
-cor.test(esoph_prop$age, esoph_prop$cases)
+cor.test(esoph.prop$age, esoph.prop$cases)
 ```
 
 Here, the confidence interval at $95%$ is $\left[0.364, 0.668\right]$. With a correlation factor of $0.533$, the confidence interval is fit. In fact, the determined p-value is $8.884\cdot10^{-8}$, which is way lower than the significance level $\alpha=0.05$. Hence, we can reject the null hypothesis that the age is independent of the œsophageal cancer cases. This therefore shows a clear relationship between the age and œsophageal cancers.
@@ -226,7 +232,7 @@ Let's compute the p-values in a more efficient way (i.e. not one by one), using 
 
 ```{r rcorr}
 library(Hmisc)
-print(cleanTable(rcorr(as.matrix(esoph_prop))$P, 0.05, rev=TRUE), digits=3, na.print=".")
+print(cleanTable(rcorr(as.matrix(esoph.prop))$P, 0.05, rev=TRUE), digits=3, na.print=".")
 ```
 
 The result is definitive: the previously identified correlations are significant, and we can reject the null hypotheses that age and alcohol are not correlated with the proportion of cases.
@@ -242,20 +248,20 @@ After carrying out these last tests, we can confirm that tobacco consumption is 
 To analyse the influence that these variables have on each other, we will construct three graphs combining the data from one variable according to the categories of another. We could construct all six possible graphs, but these three are sufficient.
 
 ```{r age_alc_tob}
-esoph_prop_qual <- data.frame(esoph$agegp, esoph$alcgp, esoph$tobgp, esoph_prop$cases)
-names(esoph_prop_qual) <- c("age", "alcohol", "tobacco", "cases")
+esoph.prop.qual <- data.frame(esoph$agegp, esoph$alcgp, esoph$tobgp, esoph.prop$cases)
+names(esoph.prop.qual) <- c("age", "alcohol", "tobacco", "cases")
 
-age_alc <- ggplot(esoph_prop_qual, aes(alcohol, cases, fill=age)) +
+age.alc <- ggplot(esoph.prop.qual, aes(alcohol, cases, fill=age)) +
   geom_bar(stat="identity", position="dodge") +
   labs(title="Age by alcohol", y="Cases proportion")
-alc_tob <- ggplot(esoph_prop_qual, aes(tobacco, cases, fill=alcohol)) +
+alc.tob <- ggplot(esoph.prop.qual, aes(tobacco, cases, fill=alcohol)) +
   geom_bar(stat="identity", position="dodge") +
   labs(title="Alcohol by tobacco", y="Cases proportion")
-age_tob <- ggplot(esoph_prop_qual, aes(tobacco, cases, fill=age)) +
+age.tob <- ggplot(esoph.prop.qual, aes(tobacco, cases, fill=age)) +
   geom_bar(stat="identity", position="dodge") +
   labs(title="Age by tobacco", y="Cases proportion")
 
-ggarrange(age_alc, alc_tob, age_tob)
+ggarrange(age.alc, alc.tob, age.tob)
 ```
 
 Let's start with the impact of age as a function of alcohol consumption. We see that from the second alcohol category, 40-79g/day, there are already 50% or more cases of œsophageal cancer for all age categories except the first two, and that from the third category, 80-119g/day, the cancer rate is almost always 100% from the age of 45 onwards. Moreover, from an alcohol consumption of 80g per day, almost all cases develop cancer, in any age group or tobacco consumption. This shows the significant impact of heavy alcohol consumption on cancer cases, but also that the age of the person will strongly determine the resistance of his or her body, and in particular that people under 44 years of age suffer much less from it.
@@ -269,49 +275,179 @@ We may therefore have here a first clue to understanding the non-correlation bet
 ## Building a model
 
 Now that we have shown the correlations between the variables let's try to go further, in order to confirm our hypothesis concerning tobacco consumption.
-For that, we can build a model on these data, allowing us to predict a probability of cancer cases according to different criteria. Let's first try to build a linear model and see if it is appropriate.
+For that, we can build a model on these data, allowing us to predict a probability of cancer cases according to different criteria. As the data seemed to be quite linear, let's first try to build a linear model and see if it is appropriate.
 
-### Linear model
+### Simple Linear Regressions
 
-Let's first build a linear model on age correlation.
+Let's build a linear model on age correlation.
+The `lm` function takes the y (predictor) and X (variable to model) values, in order to estimate the y-intercept and the slope.
 
-```{r age_linear__model}
-X <- esoph_prop$cases
-y_age <- as.numeric(esoph_prop$age) - 1
+```{r age_lr}
+y.age <- esoph.prop$age
+X <- esoph.prop$cases
 
-age_linear_model <- lm(X ~ y_age)
-summary(age_linear_model)
+age.lm <- lm(X ~ y.age)
+summary(age.lm)
 ```
 
-The p-value indicates if the model fits the data well or not. Here, we can say that there is a significant positive relationship between age group and cancer proportion (p-value << $0.001$), with an increase in cancer proportion of $0.11547$ ($11.547%$) for every unit increase in age group. Then, we can build the models for alcohol and tobacco and visualise the three linear regressions below.
+- The residuals are the distance from the observations to the fitted line. A linear model is correct when they are equally distributed around the line, i.e. the statistical values (min, max, etc.) are centered on $0$, so especially the quartiles are equidistant and the median is close to $0$. Here, it is pretty much the case.
+- The estimates are the estimated coefficients of the line.
+- The standard errors and the t-values are used to calculate the p-value. As explained before, we want the p-value to be lower than 0.05, meaning that the model will give a reliable estimation of cancer cases proportion.
+- The $R^2$ shows how much the model fits the data, i.e. the proportion of the data that the model could predict. We will discuss this later.
+
+Here, the p-value indicates a significant positive relationship between age group and cancer proportion (p-value << $0.001$), with an increase in cancer proportion of $0.11547$ ($11.547%$) for every unit increase in age group. Then, we can build the models for alcohol and tobacco and visualise the three linear regressions, as shown below.
 
 ```{r linear_regressions}
-y_alc <- as.numeric(esoph_prop$alcohol) - 1
-y_tob <- as.numeric(esoph_prop$tobacco) - 1
+# Age linear regression visualisation
 
-age_linear <- ggplot(esoph_prop, aes(x=y_age, y=X)) + geom_point(size=1) +
-  geom_smooth(method="lm") + stat_regline_equation(label.x=0.1, label.y=0.85) +
-  scale_x_continuous(labels=levels(esoph_prop$age)) +
-  labs(x="Age Groups", y="Proportion of cancers (%)") + theme_bw()
-alc_linear <- ggplot(esoph_prop, aes(x=y_alc, y=X)) + geom_point(size=1) +
-  geom_smooth(method="lm") + stat_regline_equation(label.x=0.1, label.y=0.8) +
-  scale_x_continuous(labels=levels(esoph_prop$alcohol)) +
-  labs(x="Alcohol Groups", y="Proportion of cancers (%)") + theme_bw()
-tob_linear <- ggplot(esoph_prop, aes(x=y_tob, y=X)) + geom_point(size=1) +
-  geom_smooth(method="lm") + stat_regline_equation(label.x=0.1, label.y=0.65) +
-  scale_x_continuous(labels=levels(esoph_prop$tobacco)) +
-  labs(x="Tobacco Groups", y="Proportion of cancers (%)") + theme_bw()
+# We remove 1 to start at 0 instead of 1, in order to plot the line from 0.
+# As age is a qualitative variable, it does not change the model, only the intercept.
+y.age <- y.age - 1
 
-ggarrange(age_linear, alc_linear, tob_linear)
+ggplot(esoph.prop, aes(x=y.age, y=X)) + geom_point(size=1) +
+  geom_smooth(method="lm") + stat_regline_equation(label.x=0.1, label.y=0.35) +
+  stat_sum() + scale_x_continuous(labels=levels(esoph$agegp)) +
+  stat_summary(fun.data=mean_cl_normal, col="red", lwd=1.5, alpha=0.3) +
+  labs(x="Age Groups",
+       y="Proportion of cancers (%)") + theme_bw()
 ```
 
-One more time, we can confirm that tobacco is less correlated than age or alcohol with the increase in cancer cases, but that the value is very high from the outset. In other words, a person who smokes little seems to be almost as likely to develop cancer of the œsophagus as a person who smokes much more, unlike age or alcohol, for which the probability increases gradually.
+```{r alcohol_lr}
+# Alcohol linear regression
+y.alc <- esoph.prop$alcohol
 
-However, we can notice that the error areas are relatively large, this is because the the data is not sufficiently linear to better fit the model. Moreover, for all three models, the $R^2$ value is very low. For instance in the age model, it is of about $0.28$, while a correct $R^2$ should be higher than $0.8$. This shows indeed that the previous models are not accurate enough. Thus, we will need to build logistic regressions.
+alc.lm <- lm(X ~ y.alc)
+summary(alc.lm)
+
+y.alc <- y.alc - 1
+ggplot(esoph.prop, aes(x=y.alc, y=X)) + geom_point(size=1) +
+  geom_smooth(method="lm") + stat_regline_equation(label.x=0.2, label.y=0.35) +
+  stat_sum() + scale_x_continuous(labels=levels(esoph$alcgp)) +
+  stat_summary(fun.data=mean_cl_normal, col="red", lwd=1.5, alpha=0.3) +
+  labs(title="Linear Regression of cases by alcohol", x="Alcohol Groups",
+       y="Proportion of cancers (%)") + theme_bw()
+```
+
+```{r tobacco_lr}
+# Tobacco linear regression
+y.tob <- esoph.prop$tobacco
+
+tob.lm <- lm(X ~ y.tob)
+summary(tob.lm)
+
+y.tob <- y.tob - 1
+ggplot(esoph.prop, aes(x=y.tob, y=X)) + geom_point(size=1) +
+  geom_smooth(method="lm") + stat_regline_equation(label.x=0.2, label.y=0.5) +
+  stat_sum() + scale_x_continuous(labels=levels(esoph$tobgp)) +
+  stat_summary(fun.data=mean_cl_normal, col="red", lwd=1.5, alpha=0.3) +
+  labs(title="Linear Regression of cases by tobacco", x="Tobacco Groups",
+       y="Proportion of cancers (%)") + theme_bw()
+```
+
+The p-value is very high for the tobacco model, so one more time we can confirm that tobacco is less correlated than age or alcohol with the increase in cancer cases, and that the proportion is already very high for low consumption. In other words, a person who smokes little seems to be almost as likely to develop cancer of the œsophagus as a person who smokes much more, unlike age or alcohol for which the probability increases gradually.
+
+However, we can notice that the error areas are relatively large, this is because the the data is not sufficiently linear to better fit the model. Moreover, for all three models, the $R^2$ value is very low. For instance in the age model, it is of about $0.28$, while a correct $R^2$ should be at least $0.7$. This shows indeed that the previous models are not accurate enough.
+
+Thus, let's try to build a multiple linear regression, using all available predictors in the dataset, and see if it is more accurate.
+
+### Multiple Linear Regression
+
+The simple linear regressions were not sufficiently accurate, and maybe predicting from all variables would be better. In fact, as we saw before, the qualitative variables age, alcohol and tobacco are not correlated at all, which means they provide significantly different information for the prediction.
+
+```{r multiple_lr}
+lm <- lm(cases ~ age + alcohol + tobacco, data=esoph.prop)
+summary(lm)
+```
+
+In fact, we see here that age and alcohol have a very low p-values, so the variables are statistically very significant. This means that using both variables gives a significantly better model than just one of them. However, and once again, tobacco has a quiet lower p-value, meaning that taking into account tobacco will less improve the model than the other variables. But still, the p-value is below $0.05$, which is nice for our model.
+
+Therefore, as expected, the $R^2$ is higher. With a value of $0.6$, the model could potentially predict around 60% of the values correctly. This is fine, but still not great. Thus, let's try to compute a logistic regression on œsophageal cancers proportions.
 
 ### Logistic regression
 
+Because we want to build a model on categorical variables, it would maybe be better to use a logistic regression. Logistic regression models are constructed using the maximum likelihood method. In other words, the calculated estimates are the values that maximize the likelihood of the observed data.
+Let's build this logistic model, using all predictors this time.
 
+```{r logistic_regression}
+logist <- glm(cases ~ age + alcohol + tobacco, data=esoph.prop, family=binomial)
+summary(logist)
+```
+
+We see that both age and alcohol are useful for our model, with a low p-value. However, the p-value for tobacco is very high, so it is not relevant for our modelisation.
+
+From these results, let's compute the $R^2$ value, and its associated p-value. In logistic regressions, McFaden's pseudo-$R^2$ is calculated as follows:
+
+$R^2=1-\frac{log(L_{full})}{log(L_{null})}$
+
+$L_full$ designates the maximized likelihood for the actual model, and $L_{null}$ designates the maximized likelihood for the null model, i.e. without predictors. These values are computed from the deviances given by the R model.
+The p-value will be estimated from these likelihood using a $\chi^2$ distribution.
+
+```{r pseudo_rsq}
+lk.full <- -logist$deviance / 2
+lk.null <- -logist$null.deviance / 2
+
+logist.pseudo.rsq <- 1 - lk.full / lk.null
+
+logist.p_value <- 1 - pchisq(2 * (lk.full - lk.null),
+                             df=(length(logist$coefficients) - 1))
+
+cat("R squared: ", logist.pseudo.rsq, "\np-value: ", logist.p_value)
+```
+
+We see that the $R^2$ is pretty good, $0.6$. Unfortunately, it is not much better than using a linear regression. The p-value is way below $0.05$, so the statistics here, and so the $R^2$, are significant, i.e. we can trust the results.
+
+Therefore, these results are trustable and allow us to do some predictions.
+To do this, as our dataset is very small (only $88$ samples), we will not be able to split it into train and test sets. Thus, we will directly use the original train data as the test set, and use the predicted data given with the model to compare.
+
+```{r prediction}
+
+prediction <- data.frame(prob=logist$fitted.values, cases=esoph.prop$cases)
+
+# Add a column with samples indexes in order to plot the results.
+prediction <- prediction[order(prediction$prob, decreasing=FALSE),]
+prediction$index <- 1:nrow(prediction)
+
+head(prediction)
+
+ggplot(data=prediction, aes(x=index, y=prob)) +
+	geom_point(aes(color=cases), shape=4, stroke=2) +
+	xlab("Index of predictions") + ylab("Predicted probability")
+```
+
+This graph shows the predicted probabilities of œsophageal cancers along with the actual cases proportions. We recognize somehow the characteristic S-curve of a linear regression.
+Moreover, we see that samples predicted with a high probability of cancer really have a high proportion of œsophageal cancers. Similarly, we see that samples with a low proportion were predicted with a high probability.
+
+Then, we can measure the accuracy rate of predictions by comparing the predictions with the actual proportions.
+
+```{r simple_precision}
+esoph.prop.precision <- ifelse(esoph.prop$cases > 0.5, 1, 0)
+predict.precision <- ifelse(logist$fitted.values > 0.5, 1, 0)
+
+mean(esoph.prop.precision == predict.precision)
+```
+
+The model seems to predicts correct answers at 80%, which is really great. However, this test is not precise enough because we only test two cases: below and above or equal to $0.5$.
+For the test to be more consistent, we will melt the values into four categories: below $0.25$, $0.5$, $0.75$ and $1$.
+
+```{r advanced_precision}
+for (i in esoph.prop$cases) {
+  if (i < 0.25) { esoph.prop.precision[length(esoph.prop.precision)+1] <- 0.25 }
+  else if (i < 0.5) { esoph.prop.precision[length(esoph.prop.precision)+1] <- 0.5 }
+  else if (i < 0.75) { esoph.prop.precision[length(esoph.prop.precision)+1] <- 0.75 }
+  else { esoph.prop.precision[length(esoph.prop.precision)+1] <- 1}
+}
+
+for (i in logist$fitted.values) {
+  if (i < 0.25) { predict.precision[length(predict.precision)+1] <- 0.25 }
+  else if (i < 0.5) { predict.precision[length(predict.precision)+1] <- 0.5 }
+  else if (i < 0.75) { predict.precision[length(predict.precision)+1] <- 0.75 }
+  else { predict.precision[length(predict.precision)+1] <- 1}
+}
+
+mean(esoph.prop.precision == predict.precision)
+```
+
+With this test, the model gives 60% correct predictions, which is good. Note that this value is similar to the $R^2$, but it should be a coincidence.
 
 \pagebreak
 
