@@ -138,13 +138,16 @@ library(ggpubr)
 
 age.plot <- ggplot(as.data.frame(age.proportions), aes(x=c(0:5), y=age.proportions)) +
   geom_line(col="blue") + scale_x_continuous(labels=levels(esoph$age)) +
-  labs(title="Proportion of cases by age", x="Age", y="Global percentage")
+  labs(title="Proportion of cases by age", x="Age", y="Global percentage") +
+  theme(plot.title=element_text(size=11, face="bold", hjust=0.5))
 alc.plot <- ggplot(as.data.frame(alc.proportions), aes(x=c(0:3), y=alc.proportions)) +
   geom_line(col="blue") + scale_x_continuous(labels=levels(esoph$alcgp)) +
-  labs(title="Proportion of cases by alcohol", x="Alcohol", y="Global percentage")
+  labs(title="Proportion of cases by alcohol", x="Alcohol", y="Global percentage") +
+  theme(plot.title=element_text(size=11, face="bold", hjust=0.5))
 tob.plot <- ggplot(as.data.frame(tob.proportions), aes(x=c(0:3), y=tob.proportions)) +
   geom_line(col="blue") + scale_x_continuous(labels=levels(esoph$tobgp)) +
-  labs(title="Proportion of cases by tobacco", x="Tobacco", y="Global percentage")
+  labs(title="Proportion of cases by tobacco", x="Tobacco", y="Global percentage") +
+  theme(plot.title=element_text(size=11, face="bold", hjust=0.5))
 
 ggarrange(age.plot, alc.plot, tob.plot)
 ```
@@ -221,9 +224,10 @@ print(cleanTable(esoph.prop.corr, 0.5), digits=3, na.print=".")
 
 # Graphically
 library(corrplot)
-esoph.prop.corr.plot <- cleanTable(esoph.prop.corr, NULL, 0.0)
-corrplot(as.matrix(esoph.prop.corr.plot), type="full",
-         order="hclust", tl.col="black", tl.srt=45)
+esoph.prop.corr.plot <- cleanTable(esoph.prop.corr, NULL)
+corrplot.mixed(as.matrix(esoph.prop.corr.plot), lower="color", upper="color",
+               order="hclust", title="Correlation matrix", addCoef.col="black",
+               tl.col="blue", tl.srt=45, mar=c(0,0,2,5))
 ```
 
 We do see that age and alcohol are correlated with the proportion of cases, as expected. But surprisingly, it seems that tobacco is not correlated with the proportions of cases, contrary to what seemed to appear previously.  
@@ -262,20 +266,23 @@ names(esoph.prop.qual) <- c("age", "alcohol", "tobacco", "cases")
 age.alc <- ggplot(esoph.prop.qual, aes(alcohol, cases, fill=age)) +
   geom_bar(stat="identity", position="dodge") +
   labs(title="Age by alcohol", y="Cases proportion") +
-  theme(axis.text=element_text(size=7))
+  theme(plot.title=element_text(size=11, face="bold", hjust=0.5),
+        axis.text=element_text(size=7))
 alc.tob <- ggplot(esoph.prop.qual, aes(tobacco, cases, fill=alcohol)) +
   geom_bar(stat="identity", position="dodge") +
   labs(title="Alcohol by tobacco", y="Cases proportion") +
-  theme(axis.text=element_text(size=7))
+  theme(plot.title=element_text(size=11, face="bold", hjust=0.5),
+        axis.text=element_text(size=7))
 age.tob <- ggplot(esoph.prop.qual, aes(tobacco, cases, fill=age)) +
   geom_bar(stat="identity", position="dodge") +
   labs(title="Age by tobacco", y="Cases proportion") +
-  theme(axis.text=element_text(size=7))
+  theme(plot.title=element_text(size=11, face="bold", hjust=0.5),
+        axis.text=element_text(size=7))
 
 ggarrange(age.alc, alc.tob, age.tob)
 ```
 
-Let's start with the impact of age as a function of alcohol consumption. We see that from the second alcohol category, 40-79g/day, there are already 50% or more cases of œsophageal cancer for all age categories except the first two, and that from the third category, 80-119g/day, the cancer rate is almost always 100% from the age of 45 onwards. Moreover, from an alcohol consumption of 80g per day, almost all cases develop cancer, in any age group or tobacco consumption. This shows the significant impact of heavy alcohol consumption on cancer cases, but also that the age of the person will strongly determine the resistance of his or her body, and in particular that people under 44 years of age suffer much less from it.
+Let's start with the impact of age as a function of alcohol consumption. We see that from the second alcohol category, `40-79g/day`, there are already 50% or more cases of œsophageal cancer for all age categories except the first two, and that from the third category, `80-119g/day`, the cancer rate is almost always $100$% from the age of $45$ onwards. Moreover, from an alcohol consumption of $120$g per day, almost all cases develop cancer, in any age group or tobacco consumption. This shows the significant impact of heavy alcohol consumption on cancer cases, but also that the age of the person will strongly determine the resistance of his or her body, and in particular that people under $44$ years of age suffer much less from it.
 
 Secondly, for the first two age categories, there are very few cases of œsophageal cancer, apart from alcohol consumption exceeding 119g per day. Conversely, as far as tobacco consumption is concerned, cancer cases are very high from the first age category onwards. Indeed, even at low doses of tobacco, and regardless of alcohol consumption or the age of the person, cases of cancer are already high. Moreover, certain data seem to be missing for the first age group.
 
@@ -319,8 +326,9 @@ ggplot(esoph.prop, aes(x=y.age, y=X)) + geom_point(size=1) +
   geom_smooth(method="lm") + stat_regline_equation(label.x=0.1, label.y=0.35) +
   stat_sum() + scale_x_continuous(labels=levels(esoph$agegp)) +
   stat_summary(fun.data=mean_cl_normal, col="red", lwd=1.5, alpha=0.3) +
-  labs(x="Age Groups",
-       y="Proportion of cancers (%)") + theme_bw()
+  labs(title="Linear Regression of cases by age group", x="Age Groups",
+       y="Proportion of cancers (%)") + theme_bw() +
+  theme(plot.title=element_text(size=14, face="bold", hjust=0.5))
 ```
 
 ```{r alcohol_lr}
@@ -336,7 +344,8 @@ ggplot(esoph.prop, aes(x=y.alc, y=X)) + geom_point(size=1) +
   stat_sum() + scale_x_continuous(labels=levels(esoph$alcgp)) +
   stat_summary(fun.data=mean_cl_normal, col="red", lwd=1.5, alpha=0.3) +
   labs(title="Linear Regression of cases by alcohol", x="Alcohol Groups",
-       y="Proportion of cancers (%)") + theme_bw()
+       y="Proportion of cancers (%)") + theme_bw() +
+  theme(plot.title=element_text(size=14, face="bold", hjust=0.5))
 ```
 
 ```{r tobacco_lr}
@@ -352,7 +361,8 @@ ggplot(esoph.prop, aes(x=y.tob, y=X)) + geom_point(size=1) +
   stat_sum() + scale_x_continuous(labels=levels(esoph$tobgp)) +
   stat_summary(fun.data=mean_cl_normal, col="red", lwd=1.5, alpha=0.3) +
   labs(title="Linear Regression of cases by tobacco", x="Tobacco Groups",
-       y="Proportion of cancers (%)") + theme_bw()
+       y="Proportion of cancers (%)") + theme_bw() +
+  theme(plot.title=element_text(size=14, face="bold", hjust=0.5))
 ```
 
 The p-value is very high for the tobacco model, so one more time we can confirm that tobacco is less correlated than age or alcohol with the increase in cancer cases, and that the proportion is already very high for low consumption. In other words, a person who smokes little seems to be almost as likely to develop cancer of the œsophagus as a person who smokes much more, unlike age or alcohol for which the probability increases gradually.
@@ -428,7 +438,9 @@ head(prediction)
 
 ggplot(data=prediction, aes(x=index, y=prob)) +
 	geom_point(aes(color=cases), shape=4, stroke=2) +
-	xlab("Index of predictions") + ylab("Predicted probability")
+	labs(title="Predictions compared to observations",
+	     x="Index of predictions", y="Predicted probability") +
+  theme(plot.title=element_text(size=14, face="bold", hjust=0.5))
 ```
 
 This graph shows the predicted probabilities of œsophageal cancers along with the actual cases proportions. We recognize somehow the characteristic S-curve of a linear regression.  
