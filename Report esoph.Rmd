@@ -116,9 +116,9 @@ text(x=tob.plot, y=tob.controls, label=paste(round(tob.proportions, 2), "%"), po
 ```
 
 These three bar plots show, for each group of the concerned factor, the proportion of positive and negative cases within the overall controls. As we saw, and as we still see on these plots, the controls are not equitably distributed, but looking at the proportion of cases within those controls is more consistent for our data analysis. In fact, what matters is not how many controls have been done for a given age group for example, but indeed the percentage of positive cancer cases measured.  
-For instance, the alcohol group `0-39` has $415$ controls, but only $6.99%$ of those controlled people are positive. In parallel, the group `120+` has much less controls ($67$), but actually a much higher proportion of those are positive, $67.16%$, which means that this alcohol group is way more likely to present cancer cases that the previous group.
+For instance, the alcohol group `0-39` has $415$ controls, but only $6.99$% of those controlled people are positive. In parallel, the group `120+` has much less controls ($67$), but actually a much higher proportion of those are positive, $67.16$%, which means that this alcohol group is way more likely to present cancer cases that the previous group.
 
-To finish with, case proportions seem to be more consistent to conduct further analysis, and we will base our computations on this model. The only drawback to this system is that with a different number of controls, the data collected, and therefore the proportions calculated at the same time, will be of very different accuracy. To come back to the previous example, the `120+` group does have $67.16%$ positive cases, but this proportion could well be revised downwards following further measurements. The `0-39` group has many more measurements and therefore presents more accurate data, which can therefore be relied on more confidently.
+To finish with, case proportions seem to be more consistent to conduct further analysis, and we will base our computations on this model. The only drawback to this system is that with a different number of controls, the data collected, and therefore the proportions calculated at the same time, will be of very different accuracy. To come back to the previous example, the `120+` group does have $67.16$% positive cases, but this proportion could well be revised downwards following further measurements. The `0-39` group has many more measurements and therefore presents more accurate data, which can therefore be relied on more confidently.
 
 \pagebreak
 
@@ -185,7 +185,7 @@ esoph.prop <- data.frame(age, alcohol, tobacco, cases)
 summary(esoph.prop$cases)
 ```
 
-In fact, we see that this column represents a proportion, from $0$ to $1$, with a mean of $34.68%$ positive cases.
+In fact, we see that this column represents a proportion, from $0$ to $1$, with a mean of $34.68$% positive cases.
 Note that, unlike the previous graphs here, we have calculated the proportions for each combination, for greater precision, and not the overall proportion for each variable.
 
 Now, we can calculate correlations between all three group variables and cases proportion. Let's first build and display a correlation factors matrix using default pearson's correlation.
@@ -233,7 +233,7 @@ As seen previously, to be able to reject or not the null hypothesis, we must cal
 cor.test(esoph.prop$age, esoph.prop$cases)
 ```
 
-Here, the confidence interval at $95%$ is $\left[0.364,0.668\right]$. With a correlation factor of $0.533$, the confidence interval is fit. In fact, the determined p-value is $8.884\cdot10^{-8}$, which is way lower than the significance level $\alpha=0.05$. Hence, we can reject the null hypothesis that the age is independent of the œsophageal cancer cases. This therefore shows a clear relationship between the age and œsophageal cancers.  
+Here, the confidence interval at $95$% is $\left[0.364,0.668\right]$. With a correlation factor of $0.533$, the confidence interval is fit. In fact, the determined p-value is $8.884\cdot10^{-8}$, which is way lower than the significance level $\alpha=0.05$. Hence, we can reject the null hypothesis that the age is independent of the œsophageal cancer cases. This therefore shows a clear relationship between the age and œsophageal cancers.  
 Before continuing, we must be careful not to interpret this conclusion in the wrong way. This correlation does not mean that there is a cause and effect relationship, and could even come about by chance.
 
 Let's compute the p-values in a more efficient way (i.e. not one by one), using the `rcorr` function.
@@ -261,13 +261,16 @@ names(esoph.prop.qual) <- c("age", "alcohol", "tobacco", "cases")
 
 age.alc <- ggplot(esoph.prop.qual, aes(alcohol, cases, fill=age)) +
   geom_bar(stat="identity", position="dodge") +
-  labs(title="Age by alcohol", y="Cases proportion")
+  labs(title="Age by alcohol", y="Cases proportion") +
+  theme(axis.text=element_text(size=7))
 alc.tob <- ggplot(esoph.prop.qual, aes(tobacco, cases, fill=alcohol)) +
   geom_bar(stat="identity", position="dodge") +
-  labs(title="Alcohol by tobacco", y="Cases proportion")
+  labs(title="Alcohol by tobacco", y="Cases proportion") +
+  theme(axis.text=element_text(size=7))
 age.tob <- ggplot(esoph.prop.qual, aes(tobacco, cases, fill=age)) +
   geom_bar(stat="identity", position="dodge") +
-  labs(title="Age by tobacco", y="Cases proportion")
+  labs(title="Age by tobacco", y="Cases proportion") +
+  theme(axis.text=element_text(size=7))
 
 ggarrange(age.alc, alc.tob, age.tob)
 ```
@@ -303,7 +306,7 @@ summary(age.lm)
 - The standard errors and the t-values are used to calculate the p-value. As explained before, we want the p-value to be lower than 0.05, meaning that the model will give a reliable estimation of cancer cases proportion.
 - The $R^2$ shows how much the model fits the data, i.e. the proportion of the data that the model could predict. We will discuss this later.
 
-Here, the p-value indicates a significant positive relationship between age group and cancer proportion (p-value $<<0.001$), with an increase in cancer proportion of $0.11547$ ($11.547%$) for every unit increase in age group. Then, we can build the models for alcohol and tobacco and visualise the three linear regressions, as shown below.
+Here, the p-value indicates a significant positive relationship between age group and cancer proportion (p-value $<<0.001$), with an increase in cancer proportion of $0.11547$ ($11.547$%) for every unit increase in age group. Then, we can build the models for alcohol and tobacco and visualise the three linear regressions, as shown below.
 
 ```{r linear_regressions}
 # Age linear regression visualisation
