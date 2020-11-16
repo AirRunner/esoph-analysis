@@ -1,7 +1,7 @@
 ---
 title: "Mathematics for Data Scientists – esoph dataset analysis"
 author: "KIESGEN de RICHTER Stanislas – VAIO Luca"
-date: "06/11/2020"
+date: "November 16, 2020"
 output: pdf_document
 ---
 
@@ -225,7 +225,7 @@ As seen previously, to be able to reject or not the null hypothesis, we must cal
 cor.test(esoph.prop$age, esoph.prop$cases)
 ```
 
-Here, the confidence interval at $95%$ is $\left[0.364, 0.668\right]$. With a correlation factor of $0.533$, the confidence interval is fit. In fact, the determined p-value is $8.884\cdot10^{-8}$, which is way lower than the significance level $\alpha=0.05$. Hence, we can reject the null hypothesis that the age is independent of the œsophageal cancer cases. This therefore shows a clear relationship between the age and œsophageal cancers.
+Here, the confidence interval at $95%$ is $\left[0.364,0.668\right]$. With a correlation factor of $0.533$, the confidence interval is fit. In fact, the determined p-value is $8.884\cdot10^{-8}$, which is way lower than the significance level $\alpha=0.05$. Hence, we can reject the null hypothesis that the age is independent of the œsophageal cancer cases. This therefore shows a clear relationship between the age and œsophageal cancers.
 Before continuing, we must be careful not to interpret this conclusion in the wrong way. This correlation does not mean that there is a cause and effect relationship, and could even come about by chance.
 
 Let's compute the p-values in a more efficient way (i.e. not one by one), using the `rcorr` function.
@@ -353,6 +353,10 @@ Thus, let's try to build a multiple linear regression, using all available predi
 ### Multiple Linear Regression
 
 The simple linear regressions were not sufficiently accurate, and maybe predicting from all variables would be better. In fact, as we saw before, the qualitative variables age, alcohol and tobacco are not correlated at all, which means they provide significantly different information for the prediction.
+
+With all predictors, the linear regression should look like the following:
+
+$y=\beta_0+\beta_1X_1+\beta_2X_2+\beta_3X_3$
 
 ```{r multiple_lr}
 lm <- lm(cases ~ age + alcohol + tobacco, data=esoph.prop)
