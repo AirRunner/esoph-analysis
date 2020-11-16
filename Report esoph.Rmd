@@ -340,7 +340,7 @@ summary(alc.lm)
 
 y.alc <- y.alc - 1
 ggplot(esoph.prop, aes(x=y.alc, y=X)) + geom_point(size=1) +
-  geom_smooth(method="lm") + stat_regline_equation(label.x=0.2, label.y=0.35) +
+  geom_smooth(method="lm") + stat_regline_equation(label.x=0.1, label.y=0.35) +
   stat_sum() + scale_x_continuous(labels=levels(esoph$alcgp)) +
   stat_summary(fun.data=mean_cl_normal, col="red", lwd=1.5, alpha=0.3) +
   labs(title="Linear Regression of cases by alcohol", x="Alcohol Groups",
@@ -357,7 +357,7 @@ summary(tob.lm)
 
 y.tob <- y.tob - 1
 ggplot(esoph.prop, aes(x=y.tob, y=X)) + geom_point(size=1) +
-  geom_smooth(method="lm") + stat_regline_equation(label.x=0.2, label.y=0.5) +
+  geom_smooth(method="lm") + stat_regline_equation(label.x=0.1, label.y=0.5) +
   stat_sum() + scale_x_continuous(labels=levels(esoph$tobgp)) +
   stat_summary(fun.data=mean_cl_normal, col="red", lwd=1.5, alpha=0.3) +
   labs(title="Linear Regression of cases by tobacco", x="Tobacco Groups",
@@ -437,7 +437,7 @@ prediction$index <- 1:nrow(prediction)
 head(prediction)
 
 ggplot(data=prediction, aes(x=index, y=prob)) +
-	geom_point(aes(color=cases), shape=4, stroke=2) +
+	geom_point(aes(color=cases), shape=4, stroke=2) + theme_bw() +
 	labs(title="Predictions compared to observations",
 	     x="Index of predictions", y="Predicted probability") +
   theme(plot.title=element_text(size=14, face="bold", hjust=0.5))
@@ -476,10 +476,19 @@ for (i in logist$fitted.values) {
 mean(esoph.prop.precision == predict.precision)
 ```
 
-With this test, the model gives around 70% correct predictions, which is still very good. Note that, during our test, this value seemed to tend to be similar to the $R^2$, but this should be a coincidence.
+With this test, the model gives around $70$% correct predictions, which is still very good. Note that, during our test, this value seemed to tend to be similar to the $R^2$, but this should be a coincidence.
 
 \pagebreak
 
 ## Conclusion
 
-Conclusion.
+To conclude, let's quickly summarise what we have seen on this dataset.
+
+First of all, the first observation is that the number of checks is not evenly distributed. In other words, not all combinations of the three variables `agegp`, `alcgp` and `tobgp` were controlled the same number of times. The first step is therefore to create a second cleaned dataset, with no longer the measurements counted, but rather the proportion of positive cases within the number of controls.
+
+Thus, it can be seen that age and alcohol are strongly correlated with the proportion of cancer cases, unlike tobacco consumption. This seems to be explained by the fact that the average number of cases is already very high even at low levels of tobacco consumption.
+
+This is confirmed in the construction of linear models, where tobacco has a less significant importance for the prediction of values. However, it is not to be neglected because the p-value for the multiple linear model, for example, is still sufficiently low.
+
+Finally, our logistic model allows us to predict, according to our estimates, $70$% of cancer cases with a rather good confidence.
+Nevertheless, our models are not perfect. Indeed, we can state that our data set is not sufficiently accurate, containing too few samples. It is therefore normal that our analyses are not quite right, and sometimes even wrong.
