@@ -348,6 +348,8 @@ ggplot(esoph.prop, aes(x=y.alc, y=X)) + geom_point(size=1) +
   theme(plot.title=element_text(size=14, face="bold", hjust=0.5))
 ```
 
+\pagebreak
+
 ```{r tobacco_lr}
 # Tobacco linear regression
 y.tob <- esoph.prop$tobacco
@@ -371,6 +373,8 @@ However, we can notice that the error areas are relatively large, this is becaus
 
 Thus, let's try to build a multiple linear regression, using all available predictors in the dataset, and see if it is more accurate.
 
+\pagebreak
+
 ### Multiple Linear Regression
 
 The simple linear regressions were not sufficiently accurate, and maybe predicting from all variables would be better. In fact, as we saw before, the qualitative variables age, alcohol and tobacco are not correlated at all, which means they provide significantly different information for the prediction.
@@ -384,7 +388,7 @@ lm <- lm(cases ~ age + alcohol + tobacco, data=esoph.prop)
 summary(lm)
 ```
 
-In fact, we see here that age and alcohol have a very low p-values, so the variables are statistically very significant. This means that using both variables gives a significantly better model than just one of them. However, and once again, tobacco has a quiet lower p-value, meaning that taking into account tobacco will less improve the model than the other variables. But still, the p-value is below $0.05$, which is nice for our model.
+In fact, we see here that age and alcohol have very low p-values, so the variables are statistically very significant. This means that using both variables gives a significantly better model than just one of them. However, and once again, tobacco has a quiet lower p-value, meaning that taking into account tobacco will less improve the model than the other variables. But still, the p-value is below $0.05$, which is nice for our model.
 
 Therefore, as expected, the $R^2$ is higher. With a value of $0.6$, the model could potentially predict around 60% of the values correctly. This is fine, but still not great. Thus, let's try to compute a logistic regression on œsophageal cancers proportions.
 
@@ -407,8 +411,6 @@ $R^2=1-\frac{log(L_{full})}{log(L_{null})}$
 $L_full$ designates the maximized likelihood for the actual model, and $L_{null}$ designates the maximized likelihood for the null model, i.e. without predictors. These values are computed from the deviances given by the R model.
 The p-value will be estimated from these likelihood using a $\chi^2$ distribution.
 
-\pagebreak
-
 ```{r pseudo_rsq}
 lk.full <- -logist$deviance / 2
 lk.null <- -logist$null.deviance / 2
@@ -426,7 +428,7 @@ We see that the $R^2$ is pretty good, $0.6$. Unfortunately, it is not much bette
 Therefore, these results are trustable and allow us to do some predictions.
 To do this, as our dataset is very small (only $88$ samples), we will not be able to split it into train and test sets. Thus, we will directly use the original train data as the test set, and use the predicted data given with the model to compare.
 
-```{r prediction}
+```{r prediction_graph}
 
 prediction <- data.frame(prob=logist$fitted.values, cases=esoph.prop$cases)
 
@@ -476,7 +478,28 @@ for (i in logist$fitted.values) {
 mean(esoph.prop.precision == predict.precision)
 ```
 
-With this test, the model gives around $70$% correct predictions, which is still very good. Note that, during our test, this value seemed to tend to be similar to the $R^2$, but this should be a coincidence.
+With this test, the model gives around $72$% correct predictions, which is still very good.
+
+Now, let's predict some probabilities of œsophageal cancers with our model, according to age, alcohol and tobacco consumption.
+
+```{r predictions}
+library(glm.predict)
+
+young.clean <- predicts(logist, "1;1;1")$mean
+young.poor <- predicts(logist, "1;4;4")$mean
+middle <- predicts(logist, "3;2;2")$mean
+old.clean <- predicts(logist, "6;1;1")$mean
+old.poor <- predicts(logist, "6;4;4")$mean
+
+cat("Young and clean: ", round(young.clean*100, 1), "%",
+    "\nYoung and poor: ", round(young.poor*100, 1), "%",
+    "\nMiddle: ", round(middle*100, 1), "%",
+    "\nOld and clean: ", round(old.clean*100, 1), "%",
+    "\nOld and poor: ", round(old.poor*100, 1), "%")
+```
+
+In our prediction tests, "clean" means that the person do not drink or smoke, and "poor" is the opposite.
+The results are clear: do not drink, neither smoke! According to our model, even being young, so between $25$ and $34$ years-old, the person has much more chances to develop an œsophageal cancer than an old and clean person.
 
 \pagebreak
 
@@ -490,5 +513,5 @@ Thus, it can be seen that age and alcohol are strongly correlated with the propo
 
 This is confirmed in the construction of linear models, where tobacco has a less significant importance for the prediction of values. However, it is not to be neglected because the p-value for the multiple linear model, for example, is still sufficiently low.
 
-Finally, our logistic model allows us to predict, according to our estimates, $70$% of cancer cases with a rather good confidence.
+Finally, our logistic model allows us to predict, according to our estimates, $72$% of cancer cases with a rather good confidence.
 Nevertheless, our models are not perfect. Indeed, we can state that our data set is not sufficiently accurate, containing too few samples. It is therefore normal that our analyses are not quite right, and sometimes even wrong.
