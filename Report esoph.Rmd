@@ -492,13 +492,13 @@ old.clean <- predicts(logist, "6;1;1")$mean
 old.poor <- predicts(logist, "6;4;4")$mean
 
 cat("Young and clean: ", round(young.clean*100, 1), "%",
-    "\nYoung and poor: ", round(young.poor*100, 1), "%",
+    "\nYoung and heavy consumer: ", round(young.poor*100, 1), "%",
     "\nMiddle: ", round(middle*100, 1), "%",
     "\nOld and clean: ", round(old.clean*100, 1), "%",
-    "\nOld and poor: ", round(old.poor*100, 1), "%")
+    "\nOld and heavy consumer: ", round(old.poor*100, 1), "%")
 ```
 
-In our prediction tests, "clean" means that the person do not drink or smoke, and "poor" is the opposite.
+In our prediction tests, "clean" means that the person do not drink or smoke, and "heavy consumer" is the opposite.
 The results are clear: do not drink, neither smoke! According to our model, even being young, so between $25$ and $34$ years-old, the person has much more chances to develop an œsophageal cancer than an old and clean person.
 
 \pagebreak
