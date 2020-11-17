@@ -124,13 +124,13 @@ To finish with, case proportions seem to be more consistent to conduct further a
 
 ## Hypothesis testing
 
-In this section, we can to confirm or not some hypothesis about the dataset. In order to do this, we will define null hypotheses, de noted $H_0$, and alternative hypotheses, denoted $H_a$.  
+In this section, we can to confirm or not some hypothesis about the dataset. In order to do this, we will define null hypotheses, denoted $H_0$, and alternative hypotheses, denoted $H_a$.  
 The null hypothesis is a default position that there is no relationship between two variables, and the alternative hypothesis is, on the contrary, that there is a specific relationship between those variables.
 
 ### State hypothesis
 
 We have seen that, in order to carry out our analysis, it is preferable for us to work with proportions of positive cases. Now, let's try to plot these proportions graphically by age, alcohol and tobacco groups in order to begin our analysis and state our initial hypotheses.  
-To do this, let's reuse the global percentages previously calculated for each variable (age, alcohol, tobacco)
+To do this, let's reuse the global percentages previously calculated for each variable (age, alcohol, tobacco).
 
 ```{r global_percentages}
 library(ggplot2)
@@ -408,7 +408,7 @@ From these results, let's compute the $R^2$ value, and its associated p-value. I
 
 $R^2=1-\frac{log(L_{full})}{log(L_{null})}$
 
-$L_full$ designates the maximized likelihood for the actual model, and $L_{null}$ designates the maximized likelihood for the null model, i.e. without predictors. These values are computed from the deviances given by the R model.
+$L_{full}$ designates the maximized likelihood for the actual model, and $L_{null}$ designates the maximized likelihood for the null model, i.e. without predictors. These values are computed from the deviances given by the R model.
 The p-value will be estimated from these likelihood using a $\chi^2$ distribution.
 
 ```{r pseudo_rsq}
