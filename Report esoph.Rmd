@@ -1,7 +1,7 @@
 ---
 title: "Mathematics for Data Scientists – esoph dataset analysis"
 author: "KIESGEN de RICHTER Stanislas – VAIO Luca"
-date: "November 16, 2020"
+date: "November 17, 2020"
 output: pdf_document
 ---
 
@@ -158,14 +158,14 @@ But more generally, a clear trend seems to be emerging for all three variables: 
 At this stage, we can therefore state three questions:
 
 - Does age favour the development of œsophageal cancer ?
-  - $H_0$: age and cases proportion are not correlated, i.e. correlation factor is below $0.5$.
-  - $H_a$: age and cases proportion correlation factor is higher or equal to $0.5$.
-- Do smoking habits favour the development of œsophageal cancer ?
-  - $H_0$: alcohol and cases proportion correlation factor is below $0.5$.
-  - $H_a$: alcohol and cases proportion correlation factor is higher or equal to $0.5$.
+  - $H_0$: corr $=0$, i.e. age and cases proportion are not correlated.
+  - $H_a$: corr $\neq0$, i.e. age and cases proportion are correlated.
 - Do alcoholic habits favour the development of œsophageal cancer ?
-  - $H_0$: tobacco and cases proportion correlation factor is below $0.5$.
-  - $H_a$: tobacco and cases proportion correlation factor is higher or equal to $0.5$.
+  - $H_0$: corr $=0$, i.e. alcohol and cases proportion are not correlated.
+  - $H_a$: corr $\neq0$, i.e. alcohol and cases proportion are correlated.
+- Do smoking habits favour the development of œsophageal cancer ?
+  - $H_0$: corr $=0$, i.e. tobacco and cases proportion are not correlated.
+  - $H_a$: corr $\neq0$, i.e. tobacco and cases proportion are correlated.
 
 In order to answer these questions, we need to test the null hypotheses $H_0$, which is the default position that there is no relationship between the variables. To do this, we are going to carry out significance tests of the correlations.
 
